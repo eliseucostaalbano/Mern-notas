@@ -11,7 +11,7 @@ const Login = ({ setUser }) => {
   const LidarSubmmit = async (e) => {
     e.preventDefault()
     try {
-      const { data } = await axios.post('/user/login', { email, senha })
+      const { data } = await axios.post('/api/user/login', { email, senha })
       localStorage.setItem('token', data.token)
       setUser(data)
       navegar('/')
