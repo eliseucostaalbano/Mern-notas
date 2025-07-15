@@ -3,13 +3,45 @@ import NavBar from "./components/NavBar"
 import Login from "./components/Login"
 import Registro from "./components/Registro"
 import Home from "./components/Home"
-import { useState } from "react"
+import { useState , useEffect } from "react"
+import axios from "axios"
 
 function App() {
   const [user, setUser] = useState(null)
+  const [carregando, setCarregando] = useState(true)
+ useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const { data } = await axios.get('/api/user/eu', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+          setUser(data)
+        } catch (error) {
+          console.error("Erro ao buscar usuário:", error)
+          localStorage.removeItem('token')
+        } finally {
+          setCarregando(false)
+        }
+      }
+    }
+    fetchUser()
+  }, [])
+
+  if (carregando) {
+    return (<div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="text-white text-xl">
+        Carregando...
+      </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gray-500">
-      <NavBar user={user} />
+      <NavBar user={user} setUser={setUser} />
       <Routes>
           <Route
           path="/login" element={user ? <Navigate to="/" /> : <Login setUser={setUser} />}
