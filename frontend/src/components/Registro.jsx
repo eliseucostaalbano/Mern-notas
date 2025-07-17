@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const Registro = ({ setUser }) => {
-  const [usernome, setUsernome] = useState("");
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [error, setError] = useState('')
@@ -11,7 +11,7 @@ const Registro = ({ setUser }) => {
   const LidarSubmmit = async (e) => {
     e.preventDefault()
     try {
-      const { data } = await axios.post('/api/user/registro', { usernome, email, senha })
+      const { data } = await axios.post('/api/user/registro', { nome, email, senha })
       localStorage.setItem('token', data.token)
       setUser(data)
       navegar('/')
@@ -27,9 +27,9 @@ const Registro = ({ setUser }) => {
           <div>
             <input
               type="text"
-              value={usernome}
-              onChange={(e) => setUsernome(e.target.value)}
-              placeholder="Nome de usuário"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Nome do usuário"
               className="w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
