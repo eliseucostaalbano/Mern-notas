@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import NotaModel from "./NotaModel";
 
 const Home = () => {
   const [notas, setNotas] = useState([]);
   const [error, setError] = useState("");
+  const [isModelOpen, setIsModelOpen] = useState(false);
+  const [editarNota, setEditarNota] = useState(null);
 
   const pegarNotas = async () => {
     try {
@@ -21,9 +24,31 @@ const Home = () => {
       setError("Erro ao pegar notas: " + error.message);
     }
   };
+
+  const lidarEditar = async (nota) => {
+    setEditarNota(nota);
+    setIsModelOpen(true);
+  };
+
   useEffect(() => {
     pegarNotas();
   }, []);
+
+  const lidarNotaSalva =  (novaNota) => {
+    if (editarNota) {
+      setNotas(
+        notas.map((nota) =>
+          (nota._id === novaNota._id ? novaNota : nota)
+        )
+      );
+    } else {
+      setNotas([...notas, novaNota]);
+    }
+
+    setEditarNota(null);
+    setIsModelOpen(false);
+  }
+    
   const lidarDeletar = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -42,8 +67,20 @@ const Home = () => {
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen bg-gray-500">
       {error && <p className="text-red-400 mb-4">{error}</p>}
-      <button className="fixed bottom-6 right-6 bg-gray-800 text-white w-14 h-14 text-3xl rounded-full shadow-lg hover:bg-gray-900 flex items-center justify-center">
-        <span  className="flex items-center justify-center h-full w-full pb-2">+</span>
+      <NotaModel
+        isOpen={isModelOpen}
+        onClose={() => {
+          setIsModelOpen(false);
+          setEditarNota(null);
+        }}
+        nota={editarNota}
+        onSave={lidarNotaSalva}
+      />
+      <button
+        onClick={() => setIsModelOpen(true)}
+        className="fixed bottom-6 right-6 bg-gray-800 text-white w-14 h-14 text-3xl rounded-full shadow-lg hover:bg-gray-900 flex items-center justify-center"
+      >
+        <span className="flex items-center justify-center h-full w-full pb-2">+</span>
       </button>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {notas.map((nota) => (
@@ -56,7 +93,10 @@ const Home = () => {
               {new Date(nota.createdAt).toLocaleDateString()}
             </p>
             <div className="flex space-x-2">
-              <button className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">
+              <button
+                onClick={() => lidarEditar(nota)}
+                className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+              >
                 Editar
               </button>
               <button
