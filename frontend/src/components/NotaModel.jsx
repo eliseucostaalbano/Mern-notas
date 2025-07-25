@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const NotaModel = ({ isOpen, onClose, nota, onSave }) => {
   const [titulo, setTitulo] = useState("");
@@ -11,6 +12,33 @@ const NotaModel = ({ isOpen, onClose, nota, onSave }) => {
     setError("");
   }, [nota]);
 
+  const lidarSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Usuário não autenticado");
+        return;
+      }
+      const payload = { titulo, conteudo };
+      const config  = {headers: { Authorization: `Bearer ${token}`}}
+      if (nota) {
+        const { data } = await axios.put(`/api/notas/${nota._id}`, payload, config);
+        onSave(data);
+      } else {
+        const { data } = await axios.post("/api/notas", payload, config);
+        onSave(data);
+      }
+      setTitulo("");
+      setConteudo("");
+      setError("");
+      onClose();
+    } catch (error) {
+      console.log("erro na nota salva", error);
+      setError("Falha ao salvar nota");
+    }
+  }
+   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div className="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md">
@@ -18,7 +46,7 @@ const NotaModel = ({ isOpen, onClose, nota, onSave }) => {
           {nota ? "Editar Nota" : "Criar Nota"}
         </h2>
         {error && <p className="text-red-400 mb-4">{error}</p>}
-        <form className="space-y-4">
+        <form onSubmit={lidarSubmit} className="space-y-4">
           <div>
             <input
               type="text"

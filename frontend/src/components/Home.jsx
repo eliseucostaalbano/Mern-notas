@@ -90,7 +90,7 @@ const Home = () => {
             </h3>
             <p className="text-gray-300 mb-4">{nota.conteudo}</p>
             <p className="text-sm text-gray-400 mb-4">
-              {new Date(nota.createdAt).toLocaleDateString()}
+              {new Date(nota.updatedAt).toLocaleDateString()}
             </p>
             <div className="flex space-x-2">
               <button
