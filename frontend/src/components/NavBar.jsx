@@ -13,6 +13,10 @@ const NavBar = ({user, setUser}) => {
     return () => clearTimeout(delay);
   }, [busca, navigate, user]);
 
+  useEffect(() => {
+    setBusca('')
+  }, [user])
+
    const lidarLogout = () => {
     localStorage.removeItem("token");
     setUser(null);

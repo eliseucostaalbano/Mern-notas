@@ -1,12 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import NotaModel from "./NotaModel";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
   const [notas, setNotas] = useState([]);
   const [error, setError] = useState("");
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [editarNota, setEditarNota] = useState(null);
+  const localização = useLocation();
 
   const pegarNotas = async () => {
     try {
@@ -15,11 +17,20 @@ const Home = () => {
         setError("Usuário não autenticado");
         return;
       }
+      const buscaParams = new URLSearchParams(localização.search);
+      const busca = buscaParams.get("busca") || "";
       const { data } = await axios.get("/api/notas", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      const notasFiltradas = busca
+        ? data.filter(
+            (nota) =>
+              nota.titulo.toLowerCase().includes(busca.toLowerCase()) ||
+              nota.conteudo.toLowerCase().includes(busca.toLowerCase())
+          )
+        : data;
       // console.log(data);
-      setNotas(data);
+      setNotas(notasFiltradas);
     } catch (error) {
       setError("Erro ao pegar notas: " + error.message);
     }
@@ -32,14 +43,12 @@ const Home = () => {
 
   useEffect(() => {
     pegarNotas();
-  }, []);
+  }, [localização.search]);
 
-  const lidarNotaSalva =  (novaNota) => {
+  const lidarNotaSalva = (novaNota) => {
     if (editarNota) {
       setNotas(
-        notas.map((nota) =>
-          (nota._id === novaNota._id ? novaNota : nota)
-        )
+        notas.map((nota) => (nota._id === novaNota._id ? novaNota : nota))
       );
     } else {
       setNotas([...notas, novaNota]);
@@ -47,8 +56,8 @@ const Home = () => {
 
     setEditarNota(null);
     setIsModelOpen(false);
-  }
-    
+  };
+
   const lidarDeletar = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -80,7 +89,9 @@ const Home = () => {
         onClick={() => setIsModelOpen(true)}
         className="fixed bottom-6 right-6 bg-gray-800 text-white w-14 h-14 text-3xl rounded-full shadow-lg hover:bg-gray-900 flex items-center justify-center"
       >
-        <span className="flex items-center justify-center h-full w-full pb-2">+</span>
+        <span className="flex items-center justify-center h-full w-full pb-2">
+          +
+        </span>
       </button>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {notas.map((nota) => (
