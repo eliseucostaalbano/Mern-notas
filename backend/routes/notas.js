@@ -1,5 +1,5 @@
 import express from 'express';
-import Nota from '../models/nota.js';
+import Nota from '../models/Nota.js';
 import { proteger } from '../middleware/auth.js';
 
 const router = express.Router();
