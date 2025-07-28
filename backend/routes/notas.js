@@ -4,7 +4,6 @@ import { proteger } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Rota para buscar notas
 router.get('/', proteger, async (req, res) => {
   try {
     const notas = await Nota.find({ criador: req.user._id });
@@ -15,7 +14,6 @@ router.get('/', proteger, async (req, res) => {
   }
 });
 
-//rota para buscar uma nota específica  
 router.get('/:id', proteger, async (req, res) => {
   try {
     const nota = await Nota.findById(req.params.id);
@@ -27,7 +25,7 @@ router.get('/:id', proteger, async (req, res) => {
   }
 });
 
-// Rota para criar uma nova nota
+
 router.post('/', proteger, async (req, res) => {
   const { titulo, conteudo } = req.body;
 
@@ -50,7 +48,6 @@ router.post('/', proteger, async (req, res) => {
   }
 });
 
-// Rota para atualizar uma nota
 router.put('/:id', proteger, async (req, res) => {
   const { titulo, conteudo } = req.body;
 
@@ -73,7 +70,6 @@ router.put('/:id', proteger, async (req, res) => {
   }
 });
 
-// Rota para deletar uma nota
 router.delete('/:id', proteger, async (req, res) => { 
     try {
         const nota = await Nota.findById(req.params.id);
